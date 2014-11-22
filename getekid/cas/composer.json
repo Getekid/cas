@@ -1,0 +1,25 @@
+{
+	"name": "getekid/cas",
+	"type": "phpbb-extension",
+	"description": "CAS Authentication plugin",
+	"version": "0.1.0",
+	"time": "2014-11-17",
+	"license": "GPL-2.0",
+	"authors": [{
+			"name": "Thomas Pappas",
+			"email": "getekid@gmail.com",
+			"role": "ESN Greece Forum admin"
+		}],
+	"require": {
+		"php": ">=5.3.3"
+	},
+	"require-dev": {
+		"phpbb/epv": "dev-master"
+	},
+	"extra": {
+		"display-name": "phpCAS Authentication plugin",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.1.0-RC2,<3.2.*@dev"
+		}
+	}
+}

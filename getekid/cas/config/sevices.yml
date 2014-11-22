@@ -1,0 +1,10 @@
+services:
+   auth.provider.cas:
+      class: getekid\cas\auth\provider\cas
+        arguments:
+            - @dbal.conn
+            - @config
+            - @passwords.manager
+            - @user
+        tags:
+            - { name: auth.provider }
