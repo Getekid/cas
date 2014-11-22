@@ -15,23 +15,47 @@ namespace getekid\cas\auth\provider;
 
 /**
  * phpCAS authentication provider for phpBB3
- * This is for authentication via the integrated user table
  */
 class cas extends \phpbb\auth\provider\base
 {
 
+	/**
+	 * CAS Authentication Constructor
+	 *
+	 * @param	\phpbb\db\driver\driver_interface		$db		Database object
+	 * @param	\phpbb\config\config		$config		Config object
+	 * @param	\phpbb\user			$user		User object
+	 */
+
+	public function __construct(\phpbb\db\driver\driver_interface $db, \phpbb\config\config $config, \phpbb\user $user)
+	{
+		$this->db = $db;
+		$this->config = $config;
+		$this->user = $user;
+	}
+
 	public function login($username, $password)
 {}
 
-	public function get_acp_template($new_config)
+	public function acp()
 	{
+		// These are fields required in the config table
 		return array(
-			'TEMPLATE_FILE'	=> 'auth_provider_cas.html',
+			'cas_server', 'cas_port', 'cas_uri',
+		);
+	}
+
+	public function get_acp_template($new_config)
+	{	
+		$this->user->add_lang_ext('getekid/cas','cas_acp');
+		return array(
+			'TEMPLATE_FILE'	=> '@getekid_cas/auth_provider_cas.html',
 			'TEMPLATE_VARS'	=> array(
-				'AUTH_CAS_PORT'		=> $new_config['cas_port'],
 				'AUTH_CAS_SERVER'		=> $new_config['cas_server'],
-				'AUTH_CAS_URL'			=> $new_config['cas_url'],
+				'AUTH_CAS_PORT'		=> $new_config['cas_port'],
+				'AUTH_CAS_URI'			=> $new_config['cas_uri'],
 			),
 		);
 	}
 }
+?>
