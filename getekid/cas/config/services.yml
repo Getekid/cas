@@ -4,6 +4,7 @@ services:
       arguments:
           - @dbal.conn
           - @config
+          - @request
           - @user
       tags:
           - { name: auth.provider }
