@@ -9,7 +9,7 @@
  
 namespace getekid\cas\migrations;
  
-class release_0_2_0 extends \phpbb\db\migration\migration
+class release_0_3_0 extends \phpbb\db\migration\migration
 {
 	public function effectively_installed()
 	{
