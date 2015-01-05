@@ -13,6 +13,11 @@
 
 namespace getekid\cas\auth\provider;
 
+if (!defined('IN_PHPBB'))
+{
+	exit;
+}
+
 // Load the CAS lib
 require_once('CAS/CAS.php');
 use \phpCAS;
@@ -41,23 +46,32 @@ class cas extends \phpbb\auth\provider\base
 		// The use of this function has security issues, should be avoided for production use.
 		$this->request->enable_super_globals();
 		
-		if ($this->config['cas_server'] && $this->config['cas_port'] && $this->config['cas_uri'])
+		if ($this->config['cas_host'] && $this->config['cas_port'] && $this->config['cas_uri'])
 		{
 			// Uncomment to enable debugging
 			phpCAS::setDebug();
 
 			// Initialize phpCAS
-			phpCAS::client(CAS_VERSION_2_0, $this->config['cas_server'], (int)$this->config['cas_port'], $this->config['cas_uri']);
+			phpCAS::client(constant($this->config['cas_version']), $this->config['cas_host'], (int)$this->config['cas_port'], $this->config['cas_uri']);
 			
-			// For quick testing you can disable SSL validation of the CAS server.
-			// THIS SETTING IS NOT RECOMMENDED FOR PRODUCTION.
-			// VALIDATING THE CAS SERVER IS CRUCIAL TO THE SECURITY OF THE CAS PROTOCOL!
-			phpCAS::setNoCasServerValidation();
+			if ($this->config['cas_cert'])
+			{
+				// For production use set the CA certificate that is the issuer of the cert
+				// on the CAS server and uncomment the line below
+				phpCAS::setCasServerCACert($cas_cert);
+			}
+			else
+			{
+				// For quick testing you can disable SSL validation of the CAS server.
+				// THIS SETTING IS NOT RECOMMENDED FOR PRODUCTION.
+				// VALIDATING THE CAS SERVER IS CRUCIAL TO THE SECURITY OF THE CAS PROTOCOL!
+				//phpCAS::setNoCasServerValidation();
+			}
 		}
 	}
 	
 	public function init()
-	{		
+	{
 		return;
 	}
 
@@ -82,19 +96,35 @@ class cas extends \phpbb\auth\provider\base
 	{
 		// These are fields required in the config table
 		return array(
-			'cas_server', 'cas_port', 'cas_uri',
+			'cas_version', 'cas_host', 'cas_port', 'cas_uri', 'cas_cert',
 		);
 	}
 
 	public function get_acp_template($new_config)
-	{	
+	{
+		$cas_versions = array(
+			'CAS_VERSION_1_0' => '1.0',
+			'CAS_VERSION_2_0' => '2.0',
+			'CAS_VERSION_3_0' => '3.0',
+			'SAML_VERSION_1_1'=> 'Sample 1.1',
+		);
+		
+		$cas_version_options = '';
+		
+		foreach ($cas_versions as $cnst => $version)
+		{
+			$cas_version_options .= '<option value="' . $cnst . '"' . (($new_config['cas_version']==$cnst) ? ' selected="selected"' : '') . '>' . $version . '</option>';
+		}
+		
 		$this->user->add_lang_ext('getekid/cas','cas_acp');
 		return array(
 			'TEMPLATE_FILE'	=> '@getekid_cas/auth_provider_cas.html',
 			'TEMPLATE_VARS'	=> array(
-				'AUTH_CAS_SERVER'		=> $new_config['cas_server'],
+				'AUTH_CAS_VERSION_OPTIONS' 	=> $cas_version_options,
+				'AUTH_CAS_HOST'			=> $new_config['cas_host'],
 				'AUTH_CAS_PORT'			=> $new_config['cas_port'],
-				'AUTH_CAS_URI'			=> $new_config['cas_uri'],
+				'AUTH_CAS_URI'				=> $new_config['cas_uri'],
+				'AUTH_CAS_CERT'			=> $new_config['cas_cert'],
 			),
 		);
 	}

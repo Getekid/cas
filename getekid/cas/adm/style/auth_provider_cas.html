@@ -1,8 +1,12 @@
 <fieldset id="auth_cas_settings">
-	<legend>{L_CAS}</legend>
+	<legend>{L_CAS_SERVER}</legend>
 	<dl>
-		<dt><label for="cas_server">{L_CAS_SERVER}{L_COLON}</label><br /><span>{L_CAS_SERVER_EXPLAIN}</span></dt>
-		<dd><input type="text" id="cas_server" size="40" name="config[cas_server]" value="{AUTH_CAS_SERVER}" /></dd>
+		<dt><label for="cas_version">{L_CAS_VERSION}{L_COLON}</label><br /></dt>
+		<dd><select id="cas_version" size="40" name="config[cas_version]">"{AUTH_CAS_VERSION_OPTIONS}"</select></dd>
+	</dl>
+	<dl>
+		<dt><label for="cas_host">{L_CAS_HOST}{L_COLON}</label><br /><span>{L_CAS_HOST_EXPLAIN}</span></dt>
+		<dd><input type="text" id="cas_host" size="40" name="config[cas_host]" value="{AUTH_CAS_HOST}" /></dd>
 	</dl>
 	<dl>
 		<dt><label for="cas_port">{L_CAS_PORT}{L_COLON}</label><br /><span>{L_CAS_PORT_EXPLAIN}</span></dt>
@@ -11,5 +15,9 @@
 	<dl>
 		<dt><label for="cas_uri">{L_CAS_URI}{L_COLON}</label><br /><span>{L_CAS_URI_EXPLAIN}</span></dt>
 		<dd><input type="text" id="cas_uri" size="40" name="config[cas_uri]" value="{AUTH_CAS_URI}" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="cas_cert">{L_CAS_CERT}{L_COLON}</label><br /><span>{L_CAS_CERT_EXPLAIN}</span></dt>
+		<dd><input type="text" id="cas_cert" size="40" name="config[cas_cert]" value="{AUTH_CAS_CERT}" /></dd>
 	</dl>
 </fieldset>
