@@ -1,5 +1,16 @@
 <fieldset id="auth_cas_settings">
-	<legend>{L_CAS_SERVER}</legend>
+	<legend>{L_CAS}</legend>
+	<dl>
+		<!-- IF S_AUTH_CAS_LIBR -->
+		<div class="successbox">
+			<p>{AUTH_CAS_LIBR_VERSION} {L_CAS_LIBR_SUCCESS}</p>
+		</div>
+		<!-- ELSE -->
+		<div class="errorbox">
+			<p>{L_CAS_LIBR_FAIL}</p>
+		</div>
+		<!-- ENDIF -->
+	</dl>
 	<dl>
 		<dt><label for="cas_version">{L_CAS_VERSION}{L_COLON}</label><br /></dt>
 		<dd><select id="cas_version" size="40" name="config[cas_version]">"{AUTH_CAS_VERSION_OPTIONS}"</select></dd>

@@ -84,6 +84,12 @@ class cas extends \phpbb\auth\provider\base
 		
 		$this->user->add_lang_ext('getekid/cas','cas_acp_errors');
 		
+		// Check whether the phpCAS library has been successfully loaded.
+		if(!class_exists('phpCAS'))
+		{
+			return $this->user->lang['CAS_ERROR_LIBR'];
+		}
+		
 		// check hostname
 		if (empty($this->config['cas_host']) || !preg_match('/[\.\d\-abcdefghijklmnopqrstuvwxyz]*/', $this->config['cas_host']))
 		{
@@ -151,6 +157,9 @@ class cas extends \phpbb\auth\provider\base
 		return array(
 			'TEMPLATE_FILE'	=> '@getekid_cas/auth_provider_cas.html',
 			'TEMPLATE_VARS'	=> array(
+				'S_AUTH_CAS_LIBR' => (class_exists('phpCAS')) ? true : false,
+				'AUTH_CAS_LIBR_VERSION' => (class_exists('phpCAS')) ? 'phpCAS ' . phpCAS::getVersion() : null,
+				
 				'AUTH_CAS_VERSION_OPTIONS' 	=> $cas_version_options,
 				'AUTH_CAS_HOST'			=> $new_config['cas_host'],
 				'AUTH_CAS_PORT'			=> $new_config['cas_port'],

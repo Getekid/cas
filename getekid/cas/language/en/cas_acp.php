@@ -18,7 +18,11 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
-		'CAS_SERVER'					=> 'CAS Server',
+		'CAS'									=> 'CAS Settings',
+		
+		'CAS_LIBR_SUCCESS'		=> 'has loaded successfully!',
+		'CAS_LIBR_FAIL'			=> 'phpCAS library has failed to load.',
+		
 		'CAS_VERSION'				=> 'CAS Version',
 		'CAS_HOST'						=> 'CAS Hostname',
 		'CAS_HOST_EXPLAIN'		=> 'Hostname or IP Address of the CAS server.',

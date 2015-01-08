@@ -18,6 +18,7 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
+		'CAS_ERROR_LIBR' => 'phpCAS library hasn\'t been loaded.<br>Check whether auth/provider/CAS/CAS.php exists.',
 		'CAS_ERROR_HOST' => 'Invalid CAS hostname.<br>Must be a nonempty link.',
 		'CAS_ERROR_PORT' => 'Invalid input type for CAS port.<br>Must be a nonzero integer.',
 		'CAS_ERROR_URI' => 'Invalid CAS URI.<br>Must be a path.',
