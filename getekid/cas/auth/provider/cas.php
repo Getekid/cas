@@ -19,7 +19,7 @@ if (!defined('IN_PHPBB'))
 }
 
 // Load the CAS lib
-require_once('CAS/CAS.php');
+include_once('CAS/CAS.php');
 use \phpCAS;
 
 /**
@@ -65,14 +65,45 @@ class cas extends \phpbb\auth\provider\base
 				// For quick testing you can disable SSL validation of the CAS server.
 				// THIS SETTING IS NOT RECOMMENDED FOR PRODUCTION.
 				// VALIDATING THE CAS SERVER IS CRUCIAL TO THE SECURITY OF THE CAS PROTOCOL!
-				//phpCAS::setNoCasServerValidation();
+				phpCAS::setNoCasServerValidation();
 			}
 		}
 	}
 	
 	public function init()
 	{
-		return;
+		/*
+		 * Check if the input data have the right type.
+		 *
+		 * This will NOT check for the Client being valid.
+		 *
+		 * These conditions are to prevent the call of phpCAS:client()
+		 * from producing any errors. This way no errors blocking
+		 * the user from accessing the board/acp can occure.
+		 */
+		
+		$this->user->add_lang_ext('getekid/cas','cas_acp_errors');
+		
+		// check hostname
+		if (empty($this->config['cas_host']) || !preg_match('/[\.\d\-abcdefghijklmnopqrstuvwxyz]*/', $this->config['cas_host']))
+		{
+		 	return $this->user->lang['CAS_ERROR_HOST'];
+		}
+		
+		// check port
+		if (!is_int((int)$this->config['cas_port']) || (int)$this->config['cas_port'] == 0)
+		{
+		 	return $this->user->lang['CAS_ERROR_PORT'];;
+		}
+		
+		// check URI
+		if (!preg_match('/[\.\d\-_abcdefghijklmnopqrstuvwxyz\/]*/', $this->config['cas_uri']))
+		{
+		 	return $this->user->lang['CAS_ERROR_URI'];;
+		}
+		
+		// If everything is ok, return false for no errors.
+		return false;
 	}
 
 	public function login($username, $password)
