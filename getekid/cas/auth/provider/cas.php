@@ -133,7 +133,7 @@ class cas extends \phpbb\auth\provider\base
 	{
 		// These are fields required in the config table
 		return array(
-			'cas_version', 'cas_host', 'cas_port', 'cas_uri', 'cas_cert',
+			'cas_version', 'cas_host', 'cas_port', 'cas_uri', 'cas_cert', 'cas_logout',
 		);
 	}
 
@@ -165,8 +165,17 @@ class cas extends \phpbb\auth\provider\base
 				'AUTH_CAS_PORT'			=> $new_config['cas_port'],
 				'AUTH_CAS_URI'				=> $new_config['cas_uri'],
 				'AUTH_CAS_CERT'			=> $new_config['cas_cert'],
+				'S_AUTH_CAS_LOGOUT'	=> ($new_config['cas_logout'] == 0) ? false : true,
 			),
 		);
+	}
+	
+	public function logout($data, $new_session)
+	{
+		if ($this->config['cas_logout'] == 1 && phpCAS::isAuthenticated())
+		{
+			phpCAS::logout();
+		}
 	}
 	
 	private function get_user_row($username, $default_row = array(), $select_all = true)

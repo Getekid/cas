@@ -13,7 +13,7 @@
 	</dl>
 	<dl>
 		<dt><label for="cas_version">{L_CAS_VERSION}{L_COLON}</label><br /></dt>
-		<dd><select id="cas_version" size="40" name="config[cas_version]">"{AUTH_CAS_VERSION_OPTIONS}"</select></dd>
+		<dd><select id="cas_version" name="config[cas_version]">"{AUTH_CAS_VERSION_OPTIONS}"</select></dd>
 	</dl>
 	<dl>
 		<dt><label for="cas_host">{L_CAS_HOST}{L_COLON}</label><br /><span>{L_CAS_HOST_EXPLAIN}</span></dt>
@@ -30,5 +30,10 @@
 	<dl>
 		<dt><label for="cas_cert">{L_CAS_CERT}{L_COLON}</label><br /><span>{L_CAS_CERT_EXPLAIN}</span></dt>
 		<dd><input type="text" id="cas_cert" size="40" name="config[cas_cert]" value="{AUTH_CAS_CERT}" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="cas_logout">{L_CAS_LOGOUT}{L_COLON}</label><br /><span>{L_CAS_LOGOUT_EXPLAIN}</span></dt>
+		<dd><label><input type="radio" class="radio" name="config[cas_logout]" value="1"<!-- IF S_AUTH_CAS_LOGOUT --> id="cas_logout" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label><input type="radio" class="radio" name="config[cas_logout]" value="0"<!-- IF not S_AUTH_CAS_LOGOUT --> id="cas_logout" checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 	</dl>
 </fieldset>

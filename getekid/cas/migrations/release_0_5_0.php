@@ -29,6 +29,8 @@ class release_0_5_0 extends \phpbb\db\migration\migration
 				array('cas_uri', '')),
 			array('config.add',
 				array('cas_cert', '')),
+			array('config.add',
+				array('cas_logout', 0)),
 		);
 	}
 }
