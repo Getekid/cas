@@ -7,4 +7,11 @@ services:
           - @request
           - @user
       tags:
-          - { name: auth.provider }
+          - { name: auth.provider }    
+   getekid.cas.cas_login_listener:
+      class: getekid\cas\event\cas_login_listener
+      arguments:
+          - @config
+          - @template
+      tags:
+          - { name: event.listener }

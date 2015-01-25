@@ -32,6 +32,10 @@
 		<dd><input type="text" id="cas_cert" size="40" name="config[cas_cert]" value="{AUTH_CAS_CERT}" /></dd>
 	</dl>
 	<dl>
+		<dt><label for="cas_login_text">{L_CAS_LOGIN}{L_COLON}</label><br /><span>{L_CAS_LOGIN_EXPLAIN}</span></dt>
+		<dd><input type="text" id="cas_login" size="40" name="config[cas_login]" value="{AUTH_CAS_LOGIN}" /></dd>
+	</dl>
+	<dl>
 		<dt><label for="cas_logout">{L_CAS_LOGOUT}{L_COLON}</label><br /><span>{L_CAS_LOGOUT_EXPLAIN}</span></dt>
 		<dd><label><input type="radio" class="radio" name="config[cas_logout]" value="1"<!-- IF S_AUTH_CAS_LOGOUT --> id="cas_logout" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
 		<label><input type="radio" class="radio" name="config[cas_logout]" value="0"<!-- IF not S_AUTH_CAS_LOGOUT --> id="cas_logout" checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>

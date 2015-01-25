@@ -1,0 +1,12 @@
+<!-- IF S_AUTH_IS_CAS -->
+<!-- IF not S_USER_LOGGED_IN and not S_IS_BOT -->
+	<form method="post" action="{S_LOGIN_ACTION}" class="headerspace" id="logincas">
+		<h3>{L_CAS_LOGIN}</h3>
+		<fieldset>
+			<input type="submit" name="login" value="{L_CAS_LOGIN}" class="button2" />
+			{S_LOGIN_REDIRECT}
+		</fieldset>
+	</form>
+<!-- ENDIF -->
+<div id="logindb" style="display:none">
+<!-- ENDIF -->
