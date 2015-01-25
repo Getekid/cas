@@ -19,7 +19,7 @@ if (!defined('IN_PHPBB'))
 }
 
 // Load the CAS lib
-include_once('CAS/CAS.php');
+@include_once('CAS/CAS.php');
 use \phpCAS;
 
 /**
@@ -28,20 +28,42 @@ use \phpCAS;
 class cas extends \phpbb\auth\provider\base
 {
 	/**
+	* phpBB passwords manager
+	*
+	* @var \phpbb\passwords\manager
+	*/
+	protected $passwords_manager;
+
+	/**
+	* DI container
+	*
+	* @var \Symfony\Component\DependencyInjection\ContainerInterface
+	*/
+	protected $phpbb_container;
+	
+	/**
 	 * CAS Authentication Constructor
 	 *
 	 * @param	\phpbb\db\driver\driver_interface	$db			Database object
 	 * @param	\phpbb\config\config				$config		Config object
+	 * @param	\phpbb\passwords\manager			$passwords_manager
 	 * @param	\phpbb\request\request				$request
 	 * @param	\phpbb\user							$user		User object
+	 * @param	\Symfony\Component\DependencyInjection\ContainerInterface $phpbb_container DI container
+	 * @param	string								$phpbb_root_path
+	 * @param	string								$php_ext
 	 */
 
-	public function __construct(\phpbb\db\driver\driver_interface $db, \phpbb\config\config $config, \phpbb\request\request $request, \phpbb\user $user)
+	public function __construct(\phpbb\db\driver\driver_interface $db, \phpbb\config\config $config, \phpbb\passwords\manager $passwords_manager, \phpbb\request\request $request, \phpbb\user $user, \Symfony\Component\DependencyInjection\ContainerInterface $phpbb_container, $phpbb_root_path, $php_ext)
 	{
 		$this->db = $db;
 		$this->config = $config;
+		$this->passwords_manager = $passwords_manager;
 		$this->request = $request;
 		$this->user = $user;
+		$this->phpbb_container = $phpbb_container;
+		$this->phpbb_root_path = $phpbb_root_path;
+		$this->php_ext = $php_ext;
 		
 		// The use of this function has security issues, should be avoided for production use.
 		$this->request->enable_super_globals();
@@ -113,7 +135,13 @@ class cas extends \phpbb\auth\provider\base
 	}
 
 	public function login($username, $password)
-	{	
+	{
+		if (($username != '') || ($password != ''))
+		{
+			$provider = new \phpbb\auth\provider\db($this->db, $this->config, $this->passwords_manager, $this->request, $this->user, $this->phpbb_container, $this->phpbb_root_path, $this->php_ext);
+			return $provider->login($username, $password);
+		}
+		
 		if (!(phpCAS::isAuthenticated()))
 		{
 			$this->user->session_kill();
@@ -133,7 +161,7 @@ class cas extends \phpbb\auth\provider\base
 	{
 		// These are fields required in the config table
 		return array(
-			'cas_version', 'cas_host', 'cas_port', 'cas_uri', 'cas_cert', 'cas_login', 'cas_logout',
+			'cas_version', 'cas_host', 'cas_port', 'cas_uri', 'cas_cert', 'cas_login', 'cas_db', 'cas_db_login', 'cas_logout',
 		);
 	}
 
@@ -166,6 +194,8 @@ class cas extends \phpbb\auth\provider\base
 				'AUTH_CAS_URI'				=> $new_config['cas_uri'],
 				'AUTH_CAS_CERT'			=> $new_config['cas_cert'],
 				'AUTH_CAS_LOGIN'		=> $new_config['cas_login'],
+				'S_AUTH_CAS_DB'			=> ($new_config['cas_db'] == 0) ? false : true,
+				'AUTH_CAS_DB_LOGIN'		=> $new_config['cas_db_login'],
 				'S_AUTH_CAS_LOGOUT'	=> ($new_config['cas_logout'] == 0) ? false : true,
 			),
 		);
@@ -177,6 +207,8 @@ class cas extends \phpbb\auth\provider\base
 			'TEMPLATE_FILE'	=> '@getekid_cas/login_body_cas.html',
 			'VARS'			=> array(
 				'L_CAS_LOGIN'	=> $this->config['cas_login'],
+				'S_AUTH_CAS_DB'	=> ($this->config['cas_db'] == 0) ? false : true,
+				'L_CAS_DB_LOGIN'=> $this->config['cas_db_login'],
 			),
 		);
 	}

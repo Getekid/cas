@@ -48,8 +48,10 @@ class cas_login_listener implements EventSubscriberInterface
 	public function add_cas_login_text($event)
 	{
 		$this->template->assign_vars(array(
-			'S_AUTH_IS_CAS' => ($this->config['auth_method'] == 'cas') ? true : false,
-			'L_CAS_LOGIN'	=> $this->config['cas_login'],
+			'S_AUTH_CAS' 		=> ($this->config['auth_method'] == 'cas') ? true : false,
+			'L_CAS_LOGIN'		=> $this->config['cas_login'],
+			'S_AUTH_CAS_DB'		=> ($this->config['cas_db'] == 0) ? false : true,
+			'L_CAS_DB_LOGIN'	=> $this->config['cas_db_login'],
 		));
 	}
 }

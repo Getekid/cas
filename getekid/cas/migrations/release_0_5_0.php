@@ -32,6 +32,10 @@ class release_0_5_0 extends \phpbb\db\migration\migration
 			array('config.add',
 				array('cas_login', 'Login with CAS')),
 			array('config.add',
+				array('cas_db', 0)),
+			array('config.add',
+				array('cas_db_login', 'Login without CAS')),
+			array('config.add',
 				array('cas_logout', 0)),
 		);
 	}

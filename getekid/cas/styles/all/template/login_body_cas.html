@@ -1,11 +1,13 @@
+<!-- IF not LOGIN_ERROR -->
 <!-- INCLUDEJS @getekid_cas/switchAuthBody.js -->
 <div class="content">
-	<h2>{L_CAS_LOGIN}</h2>
+	<h2 class="login-cas-title">{L_CAS_LOGIN}</h2>
 	<fieldset class="fields2">
-		<dl>
-			<dt>{S_HIDDEN_FIELDS}<input type="submit" name="login" tabindex="7" value="{L_CAS_LOGIN}" class="button1" /></dt>
-			<dd>&nbsp;</dd>
-		</dl>
+		{S_HIDDEN_FIELDS}<input type="submit" name="login" tabindex="7" value="{L_CAS_LOGIN}" class="button1" /></dt>
+			<!-- IF S_AUTH_CAS_DB -->
+			<span class="responsive-hide">|</span> <input id="switchAuth" type="button" name="switch_auth" tabindex="8" value="{L_CAS_DB_LOGIN}" class="button1" />
+			<!-- ENDIF -->
 	</fieldset>
 </div>
 <div class="content"></div>
+<!-- ENDIF -->
