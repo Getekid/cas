@@ -80,7 +80,7 @@ class cas extends \phpbb\auth\provider\base
 			{
 				// For production use set the CA certificate that is the issuer of the cert
 				// on the CAS server and uncomment the line below
-				phpCAS::setCasServerCACert($cas_cert);
+				phpCAS::setCasServerCACert($this->config['cas_cert']);
 			}
 			else
 			{
