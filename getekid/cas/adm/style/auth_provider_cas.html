@@ -49,4 +49,13 @@
 		<dd><label><input type="radio" class="radio" name="config[cas_logout]" value="1"<!-- IF S_AUTH_CAS_LOGOUT --> id="cas_logout" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
 		<label><input type="radio" class="radio" name="config[cas_logout]" value="0"<!-- IF not S_AUTH_CAS_LOGOUT --> id="cas_logout" checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
 	</dl>
+	<dl>
+		<dt><label for="cas_register">{L_CAS_REGISTER}{L_COLON}</label><br /><span>{L_CAS_REGISTER_EXPLAIN}</span></dt>
+		<dd><label><input type="radio" class="radio" name="config[cas_register]" value="1"<!-- IF S_AUTH_CAS_REGISTER --> id="cas_register" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label><input type="radio" class="radio" name="config[cas_register]" value="0"<!-- IF not S_AUTH_CAS_REGISTER --> id="cas_register" checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+	</dl>
+	<dl>
+		<dt><label for="cas_register_mail">{L_CAS_REGISTER_MAIL}{L_COLON}</label><br /><span>{L_CAS_REGISTER_MAIL_EXPLAIN}</span></dt>
+		<dd><input type="text" id="cas_register_mail" size="40" name="config[cas_register_mail]" value="{AUTH_CAS_REGISTER_MAIL}" /></dd>
+	</dl>
 </fieldset>

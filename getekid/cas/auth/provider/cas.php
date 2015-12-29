@@ -40,7 +40,7 @@ class cas extends \phpbb\auth\provider\base
 	* @var \Symfony\Component\DependencyInjection\ContainerInterface
 	*/
 	protected $phpbb_container;
-	
+
 	/**
 	 * CAS Authentication Constructor
 	 *
@@ -64,10 +64,10 @@ class cas extends \phpbb\auth\provider\base
 		$this->phpbb_container = $phpbb_container;
 		$this->phpbb_root_path = $phpbb_root_path;
 		$this->php_ext = $php_ext;
-		
+
 		// The use of this function has security issues, should be avoided for production use.
 		$this->request->enable_super_globals();
-		
+
 		if ($this->config['cas_host'] && $this->config['cas_port'] && $this->config['cas_uri'])
 		{
 			// Uncomment to enable debugging
@@ -75,7 +75,7 @@ class cas extends \phpbb\auth\provider\base
 
 			// Initialize phpCAS
 			phpCAS::client(constant($this->config['cas_version']), $this->config['cas_host'], (int)$this->config['cas_port'], $this->config['cas_uri']);
-			
+
 			if ($this->config['cas_cert'])
 			{
 				// For production use set the CA certificate that is the issuer of the cert
@@ -91,7 +91,7 @@ class cas extends \phpbb\auth\provider\base
 			}
 		}
 	}
-	
+
 	public function init()
 	{
 		/*
@@ -103,33 +103,33 @@ class cas extends \phpbb\auth\provider\base
 		 * from producing any errors. This way no errors blocking
 		 * the user from accessing the board/acp can occure.
 		 */
-		
+
 		$this->user->add_lang_ext('getekid/cas','cas_acp_errors');
-		
+
 		// Check whether the phpCAS library has been successfully loaded.
 		if(!class_exists('phpCAS'))
 		{
 			return $this->user->lang['CAS_ERROR_LIBR'];
 		}
-		
+
 		// check hostname
 		if (empty($this->config['cas_host']) || !preg_match('/[\.\d\-abcdefghijklmnopqrstuvwxyz]*/', $this->config['cas_host']))
 		{
 		 	return $this->user->lang['CAS_ERROR_HOST'];
 		}
-		
+
 		// check port
 		if (!is_int((int)$this->config['cas_port']) || (int)$this->config['cas_port'] == 0)
 		{
 		 	return $this->user->lang['CAS_ERROR_PORT'];;
 		}
-		
+
 		// check URI
 		if (!preg_match('/[\.\d\-_abcdefghijklmnopqrstuvwxyz\/]*/', $this->config['cas_uri']))
 		{
 		 	return $this->user->lang['CAS_ERROR_URI'];;
 		}
-		
+
 		// If everything is ok, return false for no errors.
 		return false;
 	}
@@ -141,19 +141,72 @@ class cas extends \phpbb\auth\provider\base
 			$provider = new \phpbb\auth\provider\db($this->db, $this->config, $this->passwords_manager, $this->request, $this->user, $this->phpbb_container, $this->phpbb_root_path, $this->php_ext);
 			return $provider->login($username, $password);
 		}
-		
+
 		if (!(phpCAS::isAuthenticated()))
 		{
 			$this->user->session_kill();
 			$this->user->session_begin();
 		}
-		
+
 		phpCAS::forceAuthentication();
-		
+		$username = phpCAS::getUser();
+
+		$user_row = $this->get_user_row($username);
+		if ($user_row == array())
+		{
+			if ($this->config['cas_register'] == 0)
+			{
+				// TODO: Change the error message to explain the user is not in the database for CAS
+				return array(
+					'status'	=> LOGIN_ERROR_USERNAME,
+					'error_msg'	=> 'LOGIN_ERROR_USERNAME',
+					'user_row'	=> array('user_id' => ANONYMOUS),
+				);
+			}
+			else
+			{
+				// Get email from CAS attributes
+				$cas_attributes = phpCAS::getAttributes();
+				$user_email = ($this->config['cas_register_mail']) ? $cas_attributes[$this->config['cas_register_mail']] : $cas_attributes['mail'];
+
+				// Validate email
+				$data = array('email' => $user_email);
+				$error = validate_data($data, array(
+					'email'				=> array(
+						array('string', false, 6, 60),
+						array('user_email')),
+				));
+				$error = array_map(array($this->user, 'lang'), $error);
+
+				// TODO: Change trigger_error with an error same as in registration form
+				if (sizeof($error))
+				{
+					$error_msgs = '';
+					foreach ($error as $error_msg)
+					{
+						$error_msgs .= $error_msg . '<br />';
+					}
+					trigger_error($error_msgs);
+				}
+
+				// Create user row
+				$user_row = array_merge($user_row, array(
+					'username'			=> $username,
+					'user_password'	=> phpbb_hash($this->gen_random_string(8)),
+					'user_email'		=> $user_email,
+					'group_id'			=> 2, // by default, the REGISTERED user group is id 2
+					// TODO: add option for adding new users to specific group by default
+					'user_type'			=> USER_NORMAL,
+				));
+				// Register user...
+				$user_id = user_add($user_row);
+			}
+		}
+
 		return array(
 			'status'	=> LOGIN_SUCCESS,
 			'error_msg'	=> false,
-			'user_row'	=> $this->get_user_row(phpCAS::getUser()),
+			'user_row'	=> $user_row,
 		);
 	}
 
@@ -161,7 +214,7 @@ class cas extends \phpbb\auth\provider\base
 	{
 		// These are fields required in the config table
 		return array(
-			'cas_version', 'cas_host', 'cas_port', 'cas_uri', 'cas_cert', 'cas_login', 'cas_db', 'cas_db_login', 'cas_logout',
+			'cas_version', 'cas_host', 'cas_port', 'cas_uri', 'cas_cert', 'cas_login', 'cas_db', 'cas_db_login', 'cas_logout', 'cas_register', 'cas_register_mail',
 		);
 	}
 
@@ -173,21 +226,21 @@ class cas extends \phpbb\auth\provider\base
 			'CAS_VERSION_3_0' => '3.0',
 			'SAML_VERSION_1_1'=> 'Sample 1.1',
 		);
-		
+
 		$cas_version_options = '';
-		
+
 		foreach ($cas_versions as $cnst => $version)
 		{
 			$cas_version_options .= '<option value="' . $cnst . '"' . (($new_config['cas_version']==$cnst) ? ' selected="selected"' : '') . '>' . $version . '</option>';
 		}
-		
+
 		$this->user->add_lang_ext('getekid/cas','cas_acp');
 		return array(
 			'TEMPLATE_FILE'	=> '@getekid_cas/auth_provider_cas.html',
 			'TEMPLATE_VARS'	=> array(
 				'S_AUTH_CAS_LIBR' => (class_exists('phpCAS')) ? true : false,
 				'AUTH_CAS_LIBR_VERSION' => (class_exists('phpCAS')) ? 'phpCAS ' . phpCAS::getVersion() : null,
-				
+
 				'AUTH_CAS_VERSION_OPTIONS' 	=> $cas_version_options,
 				'AUTH_CAS_HOST'			=> $new_config['cas_host'],
 				'AUTH_CAS_PORT'			=> $new_config['cas_port'],
@@ -197,10 +250,12 @@ class cas extends \phpbb\auth\provider\base
 				'S_AUTH_CAS_DB'			=> ($new_config['cas_db'] == 0) ? false : true,
 				'AUTH_CAS_DB_LOGIN'		=> $new_config['cas_db_login'],
 				'S_AUTH_CAS_LOGOUT'	=> ($new_config['cas_logout'] == 0) ? false : true,
+				'S_AUTH_CAS_REGISTER'	=> ($new_config['cas_register'] == 0) ? false : true,
+				'AUTH_CAS_REGISTER_MAIL'		=> $new_config['cas_register_mail'],
 			),
 		);
 	}
-	
+
 	public function get_login_data()
 	{
 		return array(
@@ -212,7 +267,7 @@ class cas extends \phpbb\auth\provider\base
 			),
 		);
 	}
-	
+
 	public function logout($data, $new_session)
 	{
 		if ($this->config['cas_logout'] == 1 && phpCAS::isAuthenticated())
@@ -220,7 +275,7 @@ class cas extends \phpbb\auth\provider\base
 			phpCAS::logout();
 		}
 	}
-	
+
 	private function get_user_row($username, $default_row = array(), $select_all = true)
 	{
 		$user_row = $default_row;
@@ -246,7 +301,12 @@ class cas extends \phpbb\auth\provider\base
             	$user_row = $row;
             }
     	}
-    
+
 		return $user_row;
-	}	
+	}
+
+	private function gen_random_string($length) {
+		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		return substr(str_shuffle($chars),0,$length);
+	}
 }
