@@ -153,6 +153,13 @@ class cas extends \phpbb\auth\provider\base
 			$this->user->session_begin();
 		}
 
+		// Set the CAS service URL (the path where we will return after authentication) as our current page where we login
+		if ($this->request->is_set_post('redirect'))
+		{
+		  $redirect_full_url = $this->request->server('HTTP_REFERER');
+		  phpCAS::setFixedServiceURL($redirect_full_url);
+		}
+
 		phpCAS::forceAuthentication();
 
 		$username = phpCAS::getUser();
