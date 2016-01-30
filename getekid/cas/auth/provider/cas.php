@@ -65,7 +65,7 @@ class cas extends \phpbb\auth\provider\base
 		$this->phpbb_root_path = $phpbb_root_path;
 		$this->php_ext = $php_ext;
 
-		// The use of this function has security issues, should be avoided for production use.
+		// The use of this function has security issues, ensure disable_super_globals is run after phpCAS use.
 		$this->request->enable_super_globals();
 
 		if ($this->config['cas_host'] && $this->config['cas_port'] && $this->config['cas_uri'])
@@ -90,6 +90,8 @@ class cas extends \phpbb\auth\provider\base
 				phpCAS::setNoCasServerValidation();
 			}
 		}
+		// Disable super globals
+		$this->request->disable_super_globals();
 	}
 
 	public function init()
@@ -142,6 +144,9 @@ class cas extends \phpbb\auth\provider\base
 			return $provider->login($username, $password);
 		}
 
+		// The use of this function has security issues, ensure disable_super_globals is run after phpCAS use.
+		$this->request->enable_super_globals();
+
 		if (!(phpCAS::isAuthenticated()))
 		{
 			$this->user->session_kill();
@@ -149,7 +154,12 @@ class cas extends \phpbb\auth\provider\base
 		}
 
 		phpCAS::forceAuthentication();
+
 		$username = phpCAS::getUser();
+		$cas_attributes = phpCAS::getAttributes();
+
+		// Disable super globals
+		$this->request->disable_super_globals();
 
 		$user_row = $this->get_user_row($username);
 		if ($user_row == array())
@@ -166,7 +176,6 @@ class cas extends \phpbb\auth\provider\base
 			else
 			{
 				// Get email from CAS attributes
-				$cas_attributes = phpCAS::getAttributes();
 				$user_email = ($this->config['cas_register_mail']) ? $cas_attributes[$this->config['cas_register_mail']] : $cas_attributes['mail'];
 
 				// Validate email
