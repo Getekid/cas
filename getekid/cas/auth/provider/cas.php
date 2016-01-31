@@ -147,12 +147,6 @@ class cas extends \phpbb\auth\provider\base
 		// The use of this function has security issues, ensure disable_super_globals is run after phpCAS use.
 		$this->request->enable_super_globals();
 
-		if (!(phpCAS::isAuthenticated()))
-		{
-			$this->user->session_kill();
-			$this->user->session_begin();
-		}
-
 		// Set the CAS service URL (the path where we will return after authentication) as our current page where we login
 		if ($this->request->is_set_post('redirect'))
 		{
