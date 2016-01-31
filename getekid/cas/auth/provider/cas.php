@@ -157,7 +157,7 @@ class cas extends \phpbb\auth\provider\base
 		if ($this->request->is_set_post('redirect'))
 		{
 		  $redirect_full_url = $this->request->server('HTTP_REFERER');
-		  phpCAS::setFixedServiceURL($redirect_full_url);
+		  phpCAS::setFixedServiceURL(htmlspecialchars_decode($redirect_full_url));
 		}
 
 		phpCAS::forceAuthentication();
