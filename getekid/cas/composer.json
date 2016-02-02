@@ -3,7 +3,7 @@
 	"type": "phpbb-extension",
 	"description": "CAS Authentication plugin",
 	"version": "1.0.0",
-	"time": "2015-1-31",
+	"time": "2016-1-31",
 	"license": "GPL-2.0",
 	"authors": [{
 			"name": "Thomas Pappas",
