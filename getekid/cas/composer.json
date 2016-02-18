@@ -2,8 +2,8 @@
 	"name": "getekid/cas",
 	"type": "phpbb-extension",
 	"description": "CAS Authentication plugin",
-	"version": "1.0.0",
-	"time": "2016-1-31",
+	"version": "1.0.1",
+	"time": "2016-2-18",
 	"license": "GPL-2.0",
 	"authors": [{
 			"name": "Thomas Pappas",

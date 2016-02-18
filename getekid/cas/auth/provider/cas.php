@@ -180,6 +180,11 @@ class cas extends \phpbb\auth\provider\base
 				$user_email = ($this->config['cas_register_mail']) ? $cas_attributes[$this->config['cas_register_mail']] : $cas_attributes['mail'];
 
 				// Validate email
+				if (!function_exists('validate_data'))
+				{
+					require($this->phpbb_root_path . 'includes/functions_user.' . $this->php_ext);
+				}
+
 				$data = array('email' => $user_email);
 				$error = validate_data($data, array(
 					'email'				=> array(
