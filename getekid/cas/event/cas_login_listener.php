@@ -64,13 +64,13 @@ class cas_login_listener implements EventSubscriberInterface
 	}
 
 	public function login_after_cas_redirect($event)
-	{
-        if ($this->user->data['username'] == 'Anonymous') {
-            $_SESSION['phpBBCAS'] = true;
+    {
+        if ($this->user->data['username'] == 'Anonymous' &&
+            array_key_exists('phpCAS', $_SESSION)) {
+            unset($_SESSION['phpBBCAS']);
             $result = $this->auth->login('', '');
         } else {
-            if (!array_key_exists('phpCAS', $_SESSION))
-                $this->user->session_kill();
+            $this->user->session_kill();
         }
 
         // Get the ticket from the URL and login in order to validate it
