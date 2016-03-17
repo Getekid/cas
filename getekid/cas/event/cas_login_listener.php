@@ -58,14 +58,22 @@ class cas_login_listener implements EventSubscriberInterface
 		$this->config = $config;
 		$this->request = $request;
 		$this->auth = $auth;
-		$this->user = $user;
+        $this->user = $user;
 		$this->template = $template;
 		$this->phpbb_root_path = $phpbb_root_path;
 	}
 
 	public function login_after_cas_redirect($event)
-	{
-		// Get the ticket from the URL and login in order to validate it
+    {
+        if ($this->user->data['username'] == 'Anonymous' &&
+            array_key_exists('phpCAS', $_SESSION)) {
+            unset($_SESSION['phpBBCAS']);
+            $result = $this->auth->login('', '');
+        } else {
+            $this->user->session_kill();
+        }
+
+        // Get the ticket from the URL and login in order to validate it
 		$cas_ticket = $this->request->variable('ticket', '', true, \phpbb\request\request_interface::GET);
 		if ($cas_ticket)
 		{

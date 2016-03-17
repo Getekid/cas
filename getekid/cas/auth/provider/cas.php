@@ -88,7 +88,9 @@ class cas extends \phpbb\auth\provider\base
 				// THIS SETTING IS NOT RECOMMENDED FOR PRODUCTION.
 				// VALIDATING THE CAS SERVER IS CRUCIAL TO THE SECURITY OF THE CAS PROTOCOL!
 				phpCAS::setNoCasServerValidation();
-			}
+            }
+
+            phpCAS::handleLogoutRequests(false);
 		}
 		// Disable super globals
 		$this->request->disable_super_globals();
