@@ -125,7 +125,7 @@ class cas extends \phpbb\auth\provider\base
 		}
 
 		// check URI
-		if (!preg_match('/[\.\d\-_abcdefghijklmnopqrstuvwxyz\/]*/', $this->config['cas_uri']))
+		if (!preg_match('/[\.\d\-_abcdefghijklmnopqrstuvwxyz\/]+/', $this->config['cas_uri']))
 		{
 			return $this->user->lang['CAS_ERROR_URI'];
 		}
