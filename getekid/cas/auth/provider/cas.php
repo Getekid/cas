@@ -139,12 +139,16 @@ class cas extends \phpbb\auth\provider\base
 	*/
 	public function login($username, $password)
 	{
+		// TODO: Re answer login-password for administrator
+		// but bug in the moment...
+		/*
 		if (($username != '') || ($password != ''))
 		{
 			$provider = new \phpbb\auth\provider\db($this->db, $this->config, $this->passwords_manager, $this->request, $this->user, $this->phpbb_container, $this->phpbb_root_path, $this->php_ext);
 			return $provider->login($username, $password);
 		}
-
+		*/
+		
 		// The use of this function has security issues, ensure disable_super_globals is run after phpCAS use.
 		$this->request->enable_super_globals();
 
