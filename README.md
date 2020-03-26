@@ -20,10 +20,12 @@ In order to install the extention:
 
 phpCAS library
 
-As all of the web plugin to enable CAS authentication, this one also requires the phpCAS library from Jasig to work (not included in this package for the user to get its from the official page). In order ro install it:
+As all of the web plugin to enable CAS authentication, this one also requires the apereo library from Jasig to work (not included in this package for the user to get its from the official page). In order ro install it:
 
-1.  Download the latest stable release from Jasig [wiki](https://wiki.jasig.org/plugins/servlet/mobile#content/view/737) or [Github](https://github.com/Jasig/phpCAS)
-2.  Extract the tgz/zip
-3.  Take the folder **containing** the "CAS.php" file, rename it to CAS and copy it to getekid/cas/auth/provider/ 
-
+1st solusion:
+   1.  Download the latest stable release from apereo :[Github](https://github.com/apereo/phpCAS)
+   2.  Extract the tgz/zip
+   3.  Take the folder **containing** the "CAS.php" file, rename it to CAS and copy it to getekid/cas/auth/provider/ 
+2nd solusion for debian:
+   => apt-get install php-cas
 Enjoy
