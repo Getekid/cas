@@ -28,4 +28,5 @@ As all of the web plugin to enable CAS authentication, this one also requires th
    3.  Take the folder **containing** the "CAS.php" file, rename it to CAS and copy it to getekid/cas/auth/provider/ 
 2nd solusion for debian:
    => apt-get install php-cas
+
 Enjoy
