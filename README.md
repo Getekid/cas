@@ -1,7 +1,7 @@
 phpbb3-CAS-Auth-plugin
 ======================
 
-A plugin to enable phpCAS Authentication for phpbb 3.1.x
+A plugin to enable phpCAS Authentication for phpbb 3.3.x
 ----------------
 Adding this extention to your phpBB3 forum will enable phpCAS Authentication for your board.  
 **This is NOT a phpbb MOD**. In phpbb 3.1.x all the modifications to the board are made through extentions.  

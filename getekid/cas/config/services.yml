@@ -2,24 +2,24 @@ services:
     auth.provider.cas:
         class: getekid\cas\auth\provider\cas
         arguments:
-            - @dbal.conn
-            - @config
-            - @passwords.manager
-            - @request
-            - @user
-            - @service_container
-            - %core.root_path%
-            - %core.php_ext%
+            - '@dbal.conn'
+            - '@config'
+            - '@passwords.manager'
+            - '@request'
+            - '@user'
+            - '@service_container'
+            - '%core.root_path%'
+            - '%core.php_ext%'
         tags:
             - { name: auth.provider }
     getekid.cas.cas_login_listener:
         class: getekid\cas\event\cas_login_listener
         arguments:
-            - @config
-            - @request
-            - @user
-            - @auth
-            - @template
-            - %core.root_path%
+            - '@config'
+            - '@request'
+            - '@user'
+            - '@auth'
+            - '@template'
+            - '%core.root_path%'
         tags:
             - { name: event.listener }
