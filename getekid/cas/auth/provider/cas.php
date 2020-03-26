@@ -71,6 +71,13 @@ class cas extends \phpbb\auth\provider\base
 			// Initialize phpCAS
 			phpCAS::client(constant($this->config['cas_version']), $this->config['cas_host'], (int)$this->config['cas_port'], $this->config['cas_uri']);
 
+			if ($this->config['cas_logout'])
+			{
+				//For Logout Phpbb if Cas logout
+				phpCAS::setSingleSignoutCallback([$this,'casSingleSignOut']);
+				phpCAS::handleLogoutRequests(true,[$this->config['cas_host']]);	
+			}
+
 			if ($this->config['cas_cert'])
 			{
 				// For production use set the CA certificate that is the issuer of the cert
@@ -140,7 +147,9 @@ class cas extends \phpbb\auth\provider\base
 	public function login($username, $password)
 	{
 		// TODO: Re answer login-password for administrator
-		// but bug in the moment...
+		// Cela veux dire que la connection se fera sur la base
+		// Je ne sais pas si c'est une bonne chose..
+		// De toute facon cela fait bugger le truc....
 		/*
 		if (($username != '') || ($password != ''))
 		{
@@ -238,7 +247,7 @@ class cas extends \phpbb\auth\provider\base
 	{
 		// These are fields required in the config table
 		return array(
-			'cas_version', 'cas_host', 'cas_port', 'cas_uri', 'cas_cert', 'cas_login', 'cas_db', 'cas_db_login', 'cas_logout', 'cas_register', 'cas_register_mail',
+			'cas_version', 'cas_host', 'cas_port', 'cas_uri', 'cas_cert', 'cas_login', 'cas_db', 'cas_db_login', 'cas_logout', 'cas_logout_phpbb', 'cas_register', 'cas_register_mail',
 		);
 	}
 
@@ -277,6 +286,7 @@ class cas extends \phpbb\auth\provider\base
 				'S_AUTH_CAS_DB'				=> ($new_config['cas_db'] == 0) ? false : true,
 				'AUTH_CAS_DB_LOGIN'			=> $new_config['cas_db_login'],
 				'S_AUTH_CAS_LOGOUT'			=> ($new_config['cas_logout'] == 0) ? false : true,
+				'S_AUTH_CAS_LOGOUT_PHPBB'		=> ($new_config['cas_logout_phpbb'] == 0) ? false : true,
 				'S_AUTH_CAS_REGISTER'		=> ($new_config['cas_register'] == 0) ? false : true,
 				'AUTH_CAS_REGISTER_MAIL'	=> $new_config['cas_register_mail'],
 			),
@@ -359,6 +369,45 @@ class cas extends \phpbb\auth\provider\base
 		}
 
 		return $user_row;
+	}
+
+	/**
+	* kill the 'username''s session.
+	*
+	* @param string	$username
+	* 	The username of the user.
+	*/
+	private function killSessionUserName($username) //, $default_row = array(), $select_all = true)
+	{
+		$user_row = $default_row;
+		$sql ="DELETE FROM phpbb_sessions WHERE session_user_id IN(SELECT user_id FROM phpbb_users WHERE username_clean = '" . 
+		$this->db->sql_escape(utf8_clean_string($username)) . "');";
+		$this->db->sql_query($sql);
+		return null;
+	}
+
+	/**
+	* Function callback if cas disconnect
+	*
+	* @param string	$ticket
+	*/
+	function casSingleSignOut($ticket) 
+	{
+		// Extract the userID from the SAML Request
+		$decoded_logout_rq = urldecode($_POST['logoutRequest']);
+		preg_match(
+	                "|<saml:NameID[^>]*>(.*)</saml:NameID>|",
+	                $decoded_logout_rq, $tick, PREG_OFFSET_CAPTURE, 3
+			);
+		$wrappedSamlNameID = preg_replace(
+	                '|<saml:NameID[^>]*>|', '', $tick[0][0]
+			);
+		$NameID = preg_replace(
+	                '|</saml:NameID>|', '', $wrappedSamlNameID
+			);
+
+		//Kill Session Of UserID:
+		$this->killSessionUserName($NameID);
 	}
 
 	/**
