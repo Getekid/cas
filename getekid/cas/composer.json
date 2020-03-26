@@ -5,11 +5,18 @@
 	"version": "1.0.1",
 	"time": "2016-2-18",
 	"license": "GPL-2.0",
-	"authors": [{
+	"authors": [
+		{
 			"name": "Thomas Pappas",
 			"email": "getekid@gmail.com",
 			"role": "ESN Greece Forum admin"
-		}],
+		},
+		{
+			"name": "Vincent Laffargue",
+			"email": "vincent.laffargue@gmail.com",
+			"role": "Forum admin"
+		}
+	],
 	"require": {
 		"php": ">=5.3.3"
 	},
