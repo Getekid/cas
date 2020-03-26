@@ -72,7 +72,7 @@ class cas extends \phpbb\auth\provider\base
 			// Initialize phpCAS
 			phpCAS::client(constant($this->config['cas_version']), $this->config['cas_host'], (int)$this->config['cas_port'], $this->config['cas_uri']);
 
-			if ($this->config['cas_logout'])
+			if ($this->config['cas_logout_phpbb'])
 			{
 				//For Logout Phpbb if Cas logout
 				phpCAS::setSingleSignoutCallback([$this,'casSingleSignOut']);
