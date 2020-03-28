@@ -1,14 +1,10 @@
 <?php
 /**
 *
-* This file is part of the phpBB Forum Software package.
+* CAS Authentication plugin extension for the phpBB Forum Software package.
 *
 * @copyright (c) phpBB Limited <https://www.phpbb.com>
 * @license GNU General Public License, version 2 (GPL-2.0)
-*
-* For full copyright and license information, please see
-* the docs/CREDITS.txt file.
-*
 */
 
 namespace getekid\cas\auth\provider;
@@ -18,12 +14,12 @@ if (!defined('IN_PHPBB'))
 	exit;
 }
 
-// Load the CAS lib
-@include_once('CAS/CAS.php');
+// Load the CAS library.
+@include_once 'CAS/CAS.php';
 use \phpCAS;
 
 /**
- * CAS authentication provider for phpBB3
+ * CAS authentication provider for phpBB3.
  */
 class cas extends \phpbb\auth\provider\base
 {
@@ -42,18 +38,17 @@ class cas extends \phpbb\auth\provider\base
 	protected $phpbb_container;
 
 	/**
-	 * CAS Authentication Constructor
-	 *
-	 * @param	\phpbb\db\driver\driver_interface	$db			Database object
-	 * @param	\phpbb\config\config				$config		Config object
-	 * @param	\phpbb\passwords\manager			$passwords_manager
-	 * @param	\phpbb\request\request				$request
-	 * @param	\phpbb\user							$user		User object
-	 * @param	\Symfony\Component\DependencyInjection\ContainerInterface $phpbb_container DI container
-	 * @param	string								$phpbb_root_path
-	 * @param	string								$php_ext
-	 */
-
+	* CAS Authentication Constructor
+	*
+	* @param \phpbb\db\driver\driver_interface							$db					Database object
+	* @param \phpbb\config\config										$config				Config object
+	* @param \phpbb\passwords\manager									$passwords_manager	Passwords Manager object
+	* @param \phpbb\request\request										$request			Request object
+	* @param \phpbb\user												$user				User object
+	* @param \Symfony\Component\DependencyInjection\ContainerInterface	$phpbb_container	DI container
+	* @param string														$phpbb_root_path	Path to phpBB's root
+	* @param string														$php_ext			PHP file extension
+	*/
 	public function __construct(\phpbb\db\driver\driver_interface $db, \phpbb\config\config $config, \phpbb\passwords\manager $passwords_manager, \phpbb\request\request $request, \phpbb\user $user, \Symfony\Component\DependencyInjection\ContainerInterface $phpbb_container, $phpbb_root_path, $php_ext)
 	{
 		$this->db = $db;
@@ -67,8 +62,9 @@ class cas extends \phpbb\auth\provider\base
 
 		// The use of this function has security issues, ensure disable_super_globals is run after phpCAS use.
 		$this->request->enable_super_globals();
-
-		if ($this->config['cas_host'] && $this->config['cas_port'] && $this->config['cas_uri'])
+		
+		//Dont test cas_uri because if it contain : "" the test bug all phpbb
+		if ($this->config['cas_host'] && $this->config['cas_port']) // && $this->config['cas_uri'])
 		{
 			// Uncomment to enable debugging
 			phpCAS::setDebug();
@@ -94,6 +90,9 @@ class cas extends \phpbb\auth\provider\base
 		$this->request->disable_super_globals();
 	}
 
+	/**
+	* {@inheritdoc}
+	*/
 	public function init()
 	{
 		/*
@@ -106,10 +105,10 @@ class cas extends \phpbb\auth\provider\base
 		 * the user from accessing the board/acp can occure.
 		 */
 
-		$this->user->add_lang_ext('getekid/cas','cas_acp_errors');
+		$this->user->add_lang_ext('getekid/cas', 'cas_acp_errors');
 
 		// Check whether the phpCAS library has been successfully loaded.
-		if(!class_exists('phpCAS'))
+		if (!class_exists('phpCAS'))
 		{
 			return $this->user->lang['CAS_ERROR_LIBR'];
 		}
@@ -117,25 +116,28 @@ class cas extends \phpbb\auth\provider\base
 		// check hostname
 		if (empty($this->config['cas_host']) || !preg_match('/[\.\d\-abcdefghijklmnopqrstuvwxyz]*/', $this->config['cas_host']))
 		{
-		 	return $this->user->lang['CAS_ERROR_HOST'];
+			return $this->user->lang['CAS_ERROR_HOST'];
 		}
 
 		// check port
 		if (!is_int((int)$this->config['cas_port']) || (int)$this->config['cas_port'] == 0)
 		{
-		 	return $this->user->lang['CAS_ERROR_PORT'];;
+			return $this->user->lang['CAS_ERROR_PORT'];
 		}
 
 		// check URI
 		if (!preg_match('/[\.\d\-_abcdefghijklmnopqrstuvwxyz\/]*/', $this->config['cas_uri']))
 		{
-		 	return $this->user->lang['CAS_ERROR_URI'];;
+			return $this->user->lang['CAS_ERROR_URI'];
 		}
 
 		// If everything is ok, return false for no errors.
 		return false;
 	}
 
+	/**
+	* {@inheritdoc}
+	*/
 	public function login($username, $password)
 	{
 		if (($username != '') || ($password != ''))
@@ -150,8 +152,8 @@ class cas extends \phpbb\auth\provider\base
 		// Set the CAS service URL (the path where we will return after authentication) as our current page where we login
 		if ($this->request->is_set_post('redirect'))
 		{
-		  $redirect_full_url = $this->request->server('HTTP_REFERER');
-		  phpCAS::setFixedServiceURL(htmlspecialchars_decode($redirect_full_url));
+			$redirect_full_url = $this->request->server('HTTP_REFERER');
+			phpCAS::setFixedServiceURL(htmlspecialchars_decode($redirect_full_url));
 		}
 
 		phpCAS::forceAuthentication();
@@ -182,14 +184,15 @@ class cas extends \phpbb\auth\provider\base
 				// Validate email
 				if (!function_exists('validate_data'))
 				{
-					require($this->phpbb_root_path . 'includes/functions_user.' . $this->php_ext);
+					require $this->phpbb_root_path . 'includes/functions_user.' . $this->php_ext;
 				}
 
 				$data = array('email' => $user_email);
 				$error = validate_data($data, array(
-					'email'				=> array(
+					'email'	=> array(
 						array('string', false, 6, 60),
-						array('user_email')),
+						array('user_email'),
+					),
 				));
 				$error = array_map(array($this->user, 'lang'), $error);
 
@@ -207,7 +210,7 @@ class cas extends \phpbb\auth\provider\base
 				// Create user row
 				$user_row = array_merge($user_row, array(
 					'username'			=> $username,
-					'user_password'	=> phpbb_hash($this->gen_random_string(8)),
+					'user_password'		=> phpbb_hash($this->gen_random_string(8)),
 					'user_email'		=> $user_email,
 					'group_id'			=> 2, // by default, the REGISTERED user group is id 2
 					// TODO: add option for adding new users to specific group by default
@@ -225,6 +228,9 @@ class cas extends \phpbb\auth\provider\base
 		);
 	}
 
+	/**
+	* {@inheritdoc}
+	*/
 	public function acp()
 	{
 		// These are fields required in the config table
@@ -233,6 +239,9 @@ class cas extends \phpbb\auth\provider\base
 		);
 	}
 
+	/**
+	* {@inheritdoc}
+	*/
 	public function get_acp_template($new_config)
 	{
 		$cas_versions = array(
@@ -249,40 +258,46 @@ class cas extends \phpbb\auth\provider\base
 			$cas_version_options .= '<option value="' . $cnst . '"' . (($new_config['cas_version']==$cnst) ? ' selected="selected"' : '') . '>' . $version . '</option>';
 		}
 
-		$this->user->add_lang_ext('getekid/cas','cas_acp');
+		$this->user->add_lang_ext('getekid/cas', 'cas_acp');
 		return array(
 			'TEMPLATE_FILE'	=> '@getekid_cas/auth_provider_cas.html',
 			'TEMPLATE_VARS'	=> array(
-				'S_AUTH_CAS_LIBR' => (class_exists('phpCAS')) ? true : false,
-				'AUTH_CAS_LIBR_VERSION' => (class_exists('phpCAS')) ? 'phpCAS ' . phpCAS::getVersion() : null,
+				'S_AUTH_CAS_LIBR'			=> (class_exists('phpCAS')) ? true : false,
+				'AUTH_CAS_LIBR_VERSION' 	=> (class_exists('phpCAS')) ? 'phpCAS ' . phpCAS::getVersion() : null,
 
-				'AUTH_CAS_VERSION_OPTIONS' 	=> $cas_version_options,
-				'AUTH_CAS_HOST'			=> $new_config['cas_host'],
-				'AUTH_CAS_PORT'			=> $new_config['cas_port'],
+				'AUTH_CAS_VERSION_OPTIONS'	=> $cas_version_options,
+				'AUTH_CAS_HOST'				=> $new_config['cas_host'],
+				'AUTH_CAS_PORT'				=> $new_config['cas_port'],
 				'AUTH_CAS_URI'				=> $new_config['cas_uri'],
-				'AUTH_CAS_CERT'			=> $new_config['cas_cert'],
-				'AUTH_CAS_LOGIN'		=> $new_config['cas_login'],
-				'S_AUTH_CAS_DB'			=> ($new_config['cas_db'] == 0) ? false : true,
-				'AUTH_CAS_DB_LOGIN'		=> $new_config['cas_db_login'],
-				'S_AUTH_CAS_LOGOUT'	=> ($new_config['cas_logout'] == 0) ? false : true,
-				'S_AUTH_CAS_REGISTER'	=> ($new_config['cas_register'] == 0) ? false : true,
-				'AUTH_CAS_REGISTER_MAIL'		=> $new_config['cas_register_mail'],
+				'AUTH_CAS_CERT'				=> $new_config['cas_cert'],
+				'AUTH_CAS_LOGIN'			=> $new_config['cas_login'],
+				'S_AUTH_CAS_DB'				=> ($new_config['cas_db'] == 0) ? false : true,
+				'AUTH_CAS_DB_LOGIN'			=> $new_config['cas_db_login'],
+				'S_AUTH_CAS_LOGOUT'			=> ($new_config['cas_logout'] == 0) ? false : true,
+				'S_AUTH_CAS_REGISTER'		=> ($new_config['cas_register'] == 0) ? false : true,
+				'AUTH_CAS_REGISTER_MAIL'	=> $new_config['cas_register_mail'],
 			),
 		);
 	}
 
+	/**
+	* {@inheritdoc}
+	*/
 	public function get_login_data()
 	{
 		return array(
 			'TEMPLATE_FILE'	=> '@getekid_cas/login_body_cas.html',
 			'VARS'			=> array(
-				'L_CAS_LOGIN'	=> $this->config['cas_login'],
-				'S_AUTH_CAS_DB'	=> ($this->config['cas_db'] == 0) ? false : true,
-				'L_CAS_DB_LOGIN'=> $this->config['cas_db_login'],
+				'L_CAS_LOGIN'		=> $this->config['cas_login'],
+				'S_AUTH_CAS_DB'		=> ($this->config['cas_db'] == 0) ? false : true,
+				'L_CAS_DB_LOGIN'	=> $this->config['cas_db_login'],
 			),
 		);
 	}
 
+	/**
+	* {@inheritdoc}
+	*/
 	public function logout($data, $new_session)
 	{
 		if ($this->config['cas_logout'] == 1 && phpCAS::isAuthenticated())
@@ -291,37 +306,69 @@ class cas extends \phpbb\auth\provider\base
 		}
 	}
 
+	/**
+	* Get the User row from the DB based on the Username.
+	*
+	* @param string	$username
+	* 	The (clean) username of the user.
+	* @param array	$default_row
+	* 	A default row to have in case the query returns no row.
+	* @param bool	$select_all
+	* 	A boolean to whether select all the columns or not.
+	* 	The columns selected if the value is false are:
+	* 		- user_id
+	* 		- username
+	* 		- user_password
+	* 		- user_passchg
+	* 		- user_email
+	* 		- user_type
+	* 		- user_style
+	* 		- user_rank
+	* 		- user_avatar
+	*
+	* @return array
+	* 	The User row data.
+	*/
 	private function get_user_row($username, $default_row = array(), $select_all = true)
 	{
 		$user_row = $default_row;
-    	$sql ='SELECT';
-    	if ($select_all)
-    	{
+		$sql ='SELECT';
+		if ($select_all)
+		{
 			$sql .= ' *';
 		}
-    	else
-    	{
+		else
+		{
 			$sql .= ' user_id, username, user_password, user_passchg, user_email, user_type, user_style, user_rank, user_avatar' /* . ', user_birthday, user_from'*/;
 		}
-    	$sql .= ' FROM ' . USERS_TABLE . "
-        	WHERE username_clean = '" . $this->db->sql_escape(utf8_clean_string($username)) . "'";
-    	$result = $this->db->sql_query($sql);
+		$sql .= ' FROM ' . USERS_TABLE . "
+			WHERE username_clean = '" . $this->db->sql_escape(utf8_clean_string($username)) . "'";
+		$result = $this->db->sql_query($sql);
 		$row = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
 
-    	if ($row)
-    	{
-        	if ( !($row['user_type'] == USER_INACTIVE || $row['user_type'] == USER_IGNORE) )
-        	{
-            	$user_row = $row;
-            }
-    	}
+		if ($row)
+		{
+			if (!($row['user_type'] == USER_INACTIVE || $row['user_type'] == USER_IGNORE))
+			{
+				$user_row = $row;
+			}
+		}
 
 		return $user_row;
 	}
 
-	private function gen_random_string($length) {
+	/**
+	* Generates a random string of a specific length.
+	*
+	* @param int	$length	The length of the generated string.
+	*
+	* @return string
+	* 	The generated random string.
+	*/
+	private function gen_random_string($length)
+	{
 		$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		return substr(str_shuffle($chars),0,$length);
+		return substr(str_shuffle($chars), 0, $length);
 	}
 }

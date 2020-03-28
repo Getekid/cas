@@ -1,17 +1,14 @@
 <?php
 /**
 *
-* @package phpBB Extension - CAS Authentication plugin
-* @copyright (c) 2013 phpBB Group
-* @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
+* CAS Authentication plugin extension for the phpBB Forum Software package.
 *
+* @copyright (c) phpBB Limited <https://www.phpbb.com>
+* @license GNU General Public License, version 2 (GPL-2.0)
 */
 
 namespace getekid\cas\event;
 
-/**
-* @ignore
-*/
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -34,25 +31,16 @@ class cas_login_listener implements EventSubscriberInterface
 	/* @var \phpbb\template\template */
 	protected $template;
 
-	static public function getSubscribedEvents()
-	{
-		return array(
-			'core.update_session_after' => 'login_after_cas_redirect',
-			'core.index_modify_page_title' => 'add_cas_login_text',
-		);
-	}
-
 	/**
 	* Constructor
 	*
-	* @param	\phpbb\config\config		$config		Config object
-	* @param	\phpbb\request\request		$request
-	* @param	\phpbb\user								$user			User object
-	* @param	\phpbb\auth\auth					$auth
-	* @param	\phpbb\template\template	$template	Template object
-	* @param	string										$phpbb_root_path
-	*/
-
+	* @param \phpbb\config\config		$config				Config object
+	* @param \phpbb\request\request		$request			Request object
+	* @param \phpbb\user				$user				User object
+	* @param \phpbb\auth\auth			$auth				Auth object
+	* @param \phpbb\template\template	$template			Template object
+	* @param string						$phpbb_root_path	Path to phpBB's root
+	 */
 	public function __construct(\phpbb\config\config $config, \phpbb\request\request $request, \phpbb\user $user, \phpbb\auth\auth $auth, \phpbb\template\template $template, $phpbb_root_path)
 	{
 		$this->config = $config;
@@ -63,6 +51,26 @@ class cas_login_listener implements EventSubscriberInterface
 		$this->phpbb_root_path = $phpbb_root_path;
 	}
 
+	/**
+	* {@inheritdoc}
+	*/
+	public static function getSubscribedEvents()
+	{
+		return array(
+			'core.update_session_after' => 'login_after_cas_redirect',
+			'core.index_modify_page_title' => 'add_cas_login_text',
+		);
+	}
+
+	/**
+	* Login the user after the CAS redirect.
+	*
+	* After the CAS login and authentication takes place, the CAS server
+	* 	redirects the user back to the forum with a ticket. Then we need
+	* 	to rerun the login function for the user to actually login in.
+	*
+	* @param \phpbb\event\data $event The event object
+	*/
 	public function login_after_cas_redirect($event)
 	{
 		// Get the ticket from the URL and login in order to validate it
@@ -92,10 +100,15 @@ class cas_login_listener implements EventSubscriberInterface
 		}
 	}
 
+	/**
+	* Add CAS login text and booleans for the index.
+	*
+	* @param \phpbb\event\data $event The event object
+	*/
 	public function add_cas_login_text($event)
 	{
 		$this->template->assign_vars(array(
-			'S_AUTH_CAS' 		=> ($this->config['auth_method'] == 'cas') ? true : false,
+			'S_AUTH_CAS'		=> ($this->config['auth_method'] == 'cas') ? true : false,
 			'L_CAS_LOGIN'		=> $this->config['cas_login'],
 			'S_AUTH_CAS_DB'		=> ($this->config['cas_db'] == 0) ? false : true,
 			'L_CAS_DB_LOGIN'	=> $this->config['cas_db_login'],

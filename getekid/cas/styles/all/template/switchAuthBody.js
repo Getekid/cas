@@ -1,9 +1,11 @@
-$(document).ready(function() {
-	$(".login-title").hide();
-	$(".fields1").hide();
-});
+$(document).ready(
+	function() {
+		$(".login-title").hide();
+		$(".fields1").hide();
+	}
+);
 
-$("#switchAuth").click(function(){
+$("#switchAuth").click(function() {
 	$(".login-cas-title").hide(500);
 	$(".fields2").hide(500);
 	$(".login-title").show(500);
