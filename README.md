@@ -1,15 +1,18 @@
-phpbb3-CAS-Auth-plugin
-======================
+# phpbb3-CAS-Auth-plugin
 
-A plugin to enable phpCAS Authentication for phpbb 3.3.x
-----------------
+## A plugin to enable phpCAS Authentication for phpbb 3.3.x
+
 Adding this extention to your phpBB3 forum will enable phpCAS Authentication for your board.  
-**This is NOT a phpbb MOD**. From phpbb 3.1.x and later versions all the modifications to the board are made through extensions.  
-   
-In order to install the extention:
 
-1.  Download the zip
-2.  Extract it's contents in the root/ext directory of your phpbb3 installation (the "getekid" folder must the one in the ext directory)
+### How to install
+
+#### Using Composer
+Run `composer require getekid/cas` to install the latest version.
+
+#### Downloading the package
+1.  Download the zip file
+2.  Extract the zip file contents in a new `root/ext/getekid/cas` directory in your phpbb3 installation
+    - i.e. the files in the repo should exist directly in the `root/ext/getekid/cas` directory
 3.  Install the phpCAS library (the steps required are below)
 4.  Login to the ACP of your forum
 5.  Go to the "Customize" tab
