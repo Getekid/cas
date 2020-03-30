@@ -62,9 +62,8 @@ class cas extends \phpbb\auth\provider\base
 
 		// The use of this function has security issues, ensure disable_super_globals is run after phpCAS use.
 		$this->request->enable_super_globals();
-		
-		//Dont test cas_uri because if it contain : "" the test bug all phpbb
-		if ($this->config['cas_host'] && $this->config['cas_port']) // && $this->config['cas_uri'])
+
+		if ($this->config['cas_host'] && $this->config['cas_port'] && $this->config['cas_uri'])
 		{
 			// Uncomment to enable debugging
 			phpCAS::setDebug();
