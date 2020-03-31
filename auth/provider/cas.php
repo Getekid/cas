@@ -14,9 +14,11 @@ if (!defined('IN_PHPBB'))
 	exit;
 }
 
-// Load the CAS library.
+// For use when using the extension without composer.
+// Load the CAS library from a CAS directory in the directory of this file.
 @include_once 'CAS/CAS.php';
-use \phpCAS;
+
+use phpCAS;
 
 /**
  * CAS authentication provider for phpBB3.
