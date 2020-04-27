@@ -18,49 +18,35 @@ if (!defined('IN_PHPBB'))
 // Load the CAS library from a CAS directory in the directory of this file.
 @include_once 'CAS/CAS.php';
 
+use phpbb\auth\provider\db;
+use phpbb\captcha\factory;
+use phpbb\config\config;
+use phpbb\db\driver\driver_interface;
+use phpbb\passwords\manager;
+use phpbb\request\request_interface;
+use phpbb\user;
 use phpCAS;
 
 /**
  * CAS authentication provider for phpBB3.
  */
-class cas extends \phpbb\auth\provider\base
+class cas extends db
 {
 	/**
-	* phpBB passwords manager
-	*
-	* @var \phpbb\passwords\manager
-	*/
-	protected $passwords_manager;
-
-	/**
-	* DI container
-	*
-	* @var \Symfony\Component\DependencyInjection\ContainerInterface
-	*/
-	protected $phpbb_container;
-
-	/**
-	* CAS Authentication Constructor
-	*
-	* @param \phpbb\db\driver\driver_interface							$db					Database object
-	* @param \phpbb\config\config										$config				Config object
-	* @param \phpbb\passwords\manager									$passwords_manager	Passwords Manager object
-	* @param \phpbb\request\request										$request			Request object
-	* @param \phpbb\user												$user				User object
-	* @param \Symfony\Component\DependencyInjection\ContainerInterface	$phpbb_container	DI container
-	* @param string														$phpbb_root_path	Path to phpBB's root
-	* @param string														$php_ext			PHP file extension
-	*/
-	public function __construct(\phpbb\db\driver\driver_interface $db, \phpbb\config\config $config, \phpbb\passwords\manager $passwords_manager, \phpbb\request\request $request, \phpbb\user $user, \Symfony\Component\DependencyInjection\ContainerInterface $phpbb_container, $phpbb_root_path, $php_ext)
+	 * CAS Authentication Constructor
+	 *
+	 * @param factory $captcha_factory
+	 * @param	config 		$config
+	 * @param	driver_interface		$db
+	 * @param	manager	$passwords_manager
+	 * @param	request_interface		$request
+	 * @param	user			$user
+	 * @param	string				$phpbb_root_path
+	 * @param	string				$php_ext
+	 */
+	public function __construct(factory $captcha_factory, config $config, driver_interface $db, manager $passwords_manager, request_interface $request, user $user, $phpbb_root_path, $php_ext)
 	{
-		$this->db = $db;
-		$this->config = $config;
-		$this->passwords_manager = $passwords_manager;
-		$this->request = $request;
-		$this->user = $user;
-		$this->phpbb_container = $phpbb_container;
-		$this->phpbb_root_path = $phpbb_root_path;
-		$this->php_ext = $php_ext;
+		parent::__construct($captcha_factory, $config ,$db ,$passwords_manager, $request, $user, $phpbb_root_path, $php_ext);
 
 		// The use of this function has security issues, ensure disable_super_globals is run after phpCAS use.
 		$this->request->enable_super_globals();
@@ -144,8 +130,7 @@ class cas extends \phpbb\auth\provider\base
 	{
 		if (($username != '') || ($password != ''))
 		{
-			$provider = new \phpbb\auth\provider\db($this->db, $this->config, $this->passwords_manager, $this->request, $this->user, $this->phpbb_container, $this->phpbb_root_path, $this->php_ext);
-			return $provider->login($username, $password);
+			return parent::login($username, $password);
 		}
 
 		// The use of this function has security issues, ensure disable_super_globals is run after phpCAS use.
