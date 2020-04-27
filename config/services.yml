@@ -2,12 +2,12 @@ services:
     auth.provider.cas:
         class: getekid\cas\auth\provider\cas
         arguments:
-            - '@dbal.conn'
+            - '@captcha.factory'
             - '@config'
+            - '@dbal.conn'
             - '@passwords.manager'
             - '@request'
             - '@user'
-            - '@service_container'
             - '%core.root_path%'
             - '%core.php_ext%'
         tags:
