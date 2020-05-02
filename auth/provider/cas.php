@@ -22,6 +22,7 @@ use phpbb\auth\provider\db;
 use phpbb\captcha\factory;
 use phpbb\config\config;
 use phpbb\db\driver\driver_interface;
+use phpbb\language\language;
 use phpbb\passwords\manager;
 use phpbb\request\request_interface;
 use phpbb\user;
@@ -32,6 +33,9 @@ use phpCAS;
  */
 class cas extends db
 {
+	/** @var language */
+	protected $language;
+
 	/**
 	 * CAS Authentication Constructor
 	 *
@@ -41,12 +45,14 @@ class cas extends db
 	 * @param	manager	$passwords_manager
 	 * @param	request_interface		$request
 	 * @param	user			$user
+	 * @param language				$language
 	 * @param	string				$phpbb_root_path
 	 * @param	string				$php_ext
 	 */
-	public function __construct(factory $captcha_factory, config $config, driver_interface $db, manager $passwords_manager, request_interface $request, user $user, $phpbb_root_path, $php_ext)
+	public function __construct(factory $captcha_factory, config $config, driver_interface $db, manager $passwords_manager, request_interface $request, user $user, language $language, $phpbb_root_path, $php_ext)
 	{
 		parent::__construct($captcha_factory, $config ,$db ,$passwords_manager, $request, $user, $phpbb_root_path, $php_ext);
+		$this->language = $language;
 
 		// The use of this function has security issues, ensure disable_super_globals is run after phpCAS use.
 		$this->request->enable_super_globals();
@@ -93,30 +99,30 @@ class cas extends db
 		 * the user from accessing the board/acp can occure.
 		 */
 
-		$this->user->add_lang_ext('getekid/cas', 'cas_acp_errors');
+		$this->language->add_lang('cas_acp_errors', 'getekid/cas');
 
 		// Check whether the phpCAS library has been successfully loaded.
 		if (!class_exists('phpCAS'))
 		{
-			return $this->user->lang['CAS_ERROR_LIBR'];
+			return $this->language->lang('CAS_ERROR_LIBR');
 		}
 
 		// check hostname
 		if (empty($this->config['cas_host']) || !preg_match('/[\.\d\-abcdefghijklmnopqrstuvwxyz]*/', $this->config['cas_host']))
 		{
-			return $this->user->lang['CAS_ERROR_HOST'];
+			return $this->language->lang('CAS_ERROR_HOST');
 		}
 
 		// check port
 		if (!is_int((int)$this->config['cas_port']) || (int)$this->config['cas_port'] == 0)
 		{
-			return $this->user->lang['CAS_ERROR_PORT'];
+			return $this->language->lang('CAS_ERROR_PORT');
 		}
 
 		// check URI
 		if (!preg_match('/[\.\d\-_abcdefghijklmnopqrstuvwxyz\/]*/', $this->config['cas_uri']))
 		{
-			return $this->user->lang['CAS_ERROR_URI'];
+			return $this->language->lang('CAS_ERROR_URI');
 		}
 
 		// If everything is ok, return false for no errors.
@@ -181,7 +187,7 @@ class cas extends db
 						array('user_email'),
 					),
 				));
-				$error = array_map(array($this->user, 'lang'), $error);
+				$error = array_map(array($this->language, 'lang'), $error);
 
 				// TODO: Change trigger_error with an error same as in registration form
 				if (sizeof($error))
@@ -197,7 +203,7 @@ class cas extends db
 				// Create user row
 				$user_row = array_merge($user_row, array(
 					'username'			=> $username,
-					'user_password'		=> phpbb_hash($this->gen_random_string(8)),
+					'user_password'		=> $this->passwords_manager->hash($this->gen_random_string(8)),
 					'user_email'		=> $user_email,
 					'group_id'			=> 2, // by default, the REGISTERED user group is id 2
 					// TODO: add option for adding new users to specific group by default
@@ -245,7 +251,7 @@ class cas extends db
 			$cas_version_options .= '<option value="' . $cnst . '"' . (($new_config['cas_version']==$cnst) ? ' selected="selected"' : '') . '>' . $version . '</option>';
 		}
 
-		$this->user->add_lang_ext('getekid/cas', 'cas_acp');
+		$this->language->add_lang('cas_acp', 'getekid/cas');
 		return array(
 			'TEMPLATE_FILE'	=> '@getekid_cas/auth_provider_cas.html',
 			'TEMPLATE_VARS'	=> array(
