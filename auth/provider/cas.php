@@ -55,7 +55,7 @@ class cas extends db
 		if ($this->config['cas_host'] && $this->config['cas_port']) // && $this->config['cas_uri'])
 		{
 			// Uncomment to enable debugging
-			phpCAS::setDebug();
+			// phpCAS::setDebug();
 
 			// Initialize phpCAS
 			phpCAS::client(constant($this->config['cas_version']), $this->config['cas_host'], (int)$this->config['cas_port'], $this->config['cas_uri']);
