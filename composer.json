@@ -4,11 +4,10 @@
 	"description": "CAS Authentication plugin",
 	"version": "2.0.1",
 	"time": "2016-2-18",
-	"license": "GPL-2.0",
+	"license": "GPL-2.0-only",
 	"authors": [{
 			"name": "Thomas Pappas",
-			"email": "getekid@gmail.com",
-			"role": "ESN Greece Forum admin"
+			"email": "getekid@gmail.com"
 		}],
 	"require": {
 		"php": ">=5.3.3",
@@ -18,9 +17,9 @@
 		"phpbb/epv": "dev-master"
 	},
 	"extra": {
-		"display-name": "phpCAS Authentication plugin",
+		"display-name": "CAS authentication",
 		"soft-require": {
-			"phpbb/phpbb": ">=3.1.0-RC2,<3.2.*@dev"
+			"phpbb/phpbb": ">=3.3.0,<4.0.0@dev"
 		}
 	}
 }
