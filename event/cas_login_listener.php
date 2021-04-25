@@ -57,6 +57,7 @@ class cas_login_listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return array(
+			'core.session_create_after' => 'login_after_cas_redirect',
 			'core.update_session_after' => 'login_after_cas_redirect',
 			'core.index_modify_page_title' => 'add_cas_login_text',
 		);
